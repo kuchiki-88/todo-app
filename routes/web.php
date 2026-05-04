@@ -1,15 +1,30 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TodoController;
 
 Route::get('/', function () {
-    return view('todo');
+    return view('welcome');
 });
-use App\Http\Controllers\Api\TodoController;
 
-Route::prefix('api')->group(function () {
-    Route::get('/todos', [TodoController::class, 'index']);
-    Route::post('/todos', [TodoController::class, 'store']);
-    Route::put('/todos/{id}', [TodoController::class, 'update']);
-    Route::delete('/todos/{id}', [TodoController::class, 'destroy']);
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::middleware('auth')->group(function () {
+
+    Route::get('/api/todos', [TodoController::class, 'index']);
+    Route::post('/api/todos', [TodoController::class, 'store']);
+    Route::put('/api/todos/{id}', [TodoController::class, 'update']);
+    Route::delete('/api/todos/{id}', [TodoController::class, 'destroy']);
+
+});
+
+require __DIR__.'/auth.php';

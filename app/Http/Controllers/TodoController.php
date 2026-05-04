@@ -1,37 +1,37 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\Todo;
 use Illuminate\Http\Request;
+use App\Models\Todo;
 
 class TodoController extends Controller
 {
     // 一覧取得
     public function index()
     {
-        return response()->json(Todo::all());
+        return Todo::where('user_id', auth()->id())->get();
     }
 
-    // 新規作成
+    // 保存
     public function store(Request $request)
     {
-        $todo = Todo::create([
-            'title' => $request->title
+        return Todo::create([
+            'title' => $request->title,
             'user_id' => auth()->id(),
         ]);
-
-        return response()->json($todo);
     }
 
     // 更新
     public function update(Request $request, $id)
     {
         $todo = Todo::findOrFail($id);
-        $todo->update($request->all());
 
-        return response()->json($todo);
+        $todo->update([
+            'completed' => $request->completed
+        ]);
+
+        return $todo;
     }
 
     // 削除
@@ -39,6 +39,8 @@ class TodoController extends Controller
     {
         Todo::destroy($id);
 
-        return response()->json(['message' => 'deleted']);
+        return response()->json([
+            'message' => 'deleted'
+        ]);
     }
 }

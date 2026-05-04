@@ -11,14 +11,16 @@ class TodoController extends Controller
     // 一覧取得
     public function index()
     {
-        return response()->json(Todo::all());
+        return response()->json(
+            Todo::where('user_id', auth()->id())->get()
+        );
     }
 
     // 新規作成
     public function store(Request $request)
     {
         $todo = Todo::create([
-            'title' => $request->title
+            'title' => $request->title,
             'user_id' => auth()->id(),
         ]);
 
@@ -29,7 +31,10 @@ class TodoController extends Controller
     public function update(Request $request, $id)
     {
         $todo = Todo::findOrFail($id);
-        $todo->update($request->all());
+
+        $todo->update([
+            'completed' => $request->completed
+        ]);
 
         return response()->json($todo);
     }
@@ -39,6 +44,8 @@ class TodoController extends Controller
     {
         Todo::destroy($id);
 
-        return response()->json(['message' => 'deleted']);
+        return response()->json([
+            'message' => 'deleted'
+        ]);
     }
 }

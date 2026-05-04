@@ -27,12 +27,31 @@
             list.innerHTML = '';
 
             todos.forEach(todo => {
-                list.innerHTML += `
-                    <li class="border-b py-2">
-                        ${todo.title}
-                    </li>
-                `;
-            });
+    list.innerHTML += `
+        <li class="border-b py-2 flex items-center justify-between">
+
+            <div>
+                <input
+                    type="checkbox"
+                    ${todo.completed ? 'checked' : ''}
+                    onchange="toggleTodo(${todo.id}, this.checked)"
+                >
+
+                <span style="${todo.completed ? 'text-decoration: line-through;' : ''}">
+                    ${todo.title}
+                </span>
+            </div>
+
+            <button
+                onclick="deleteTodo(${todo.id})"
+                class="bg-red-500 text-white px-2 py-1 rounded"
+            >
+                削除
+            </button>
+
+        </li>
+    `;
+});
         }
 
         async function addTodo() {
@@ -53,6 +72,33 @@
 
             fetchTodos();
         }
+
+        async function toggleTodo(id, completed) {
+
+    await fetch(`/api/todos/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            completed: completed
+        })
+    });
+
+    fetchTodos();
+}
+async function deleteTodo(id) {
+
+    await fetch(`/api/todos/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        }
+    });
+
+    fetchTodos();
+}
 
         fetchTodos();
     </script>

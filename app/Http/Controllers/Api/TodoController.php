@@ -19,6 +19,10 @@ class TodoController extends Controller
     // 新規作成
     public function store(Request $request)
     {
+        $request->validate([
+        'title' => 'required|max:255'
+        ]);
+        
         $todo = Todo::create([
             'title' => $request->title,
             'user_id' => auth()->id(),

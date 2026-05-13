@@ -37,10 +37,17 @@
                     onchange="toggleTodo(${todo.id}, this.checked)"
                 >
 
-                <span style="${todo.completed ? 'text-decoration: line-through;' : ''}">
+                <span id="title-${todo.id}"style="${todo.completed ? 'text-decoration: line-through;' : ''}">
                     ${todo.title}
                 </span>
             </div>
+
+            <button
+                onclick="editTodo(${todo.id}, '${todo.title}')"
+                class="bg-yellow-500 text-white px-2 py-1 rounded mr-2"
+            >
+                編集
+            </button>
 
             <button
                 onclick="deleteTodo(${todo.id})"
@@ -72,6 +79,26 @@
 
             fetchTodos();
         }
+
+        async function editTodo(id, oldTitle) {
+
+    const newTitle = prompt('新しいタイトルを入力', oldTitle);
+
+    if (!newTitle) return;
+
+    await fetch(`/api/todos/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            title: newTitle
+        })
+    });
+
+    fetchTodos();
+}
 
         async function toggleTodo(id, completed) {
 
